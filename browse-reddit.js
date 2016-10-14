@@ -16,6 +16,11 @@ function displayListSubreddit(name) {
     console.log(('https:reddit.com/r/' + name.data.display_name).blue.underline);
     console.log('\n');
 }
+function displaySubRedditPost(name) {
+    console.log(post.data.title.bold);
+    console.log(('https://reddit.com' + post.data.permalink).blue.underline);
+    console.log('\n');
+}
 
 var menuChoices = [{
     name: 'Show homepage',
@@ -96,12 +101,38 @@ function mainMenu() {
                                 var userInput = input['menu'];
                                 redditFunctions.getSubreddit(userInput, function(err, res) {
                                     if (err) {
-                                        console.log(err.stack);
                                         console.log("There was a problem loading subreddit");
                                     }
                                     else {
-                                        res.forEach(displayPost);
-                                        mainMenu();
+                                        var mapedArraySubPost = res.map(function(element){
+                                            return {
+                                                name: element.data.title,
+                                                value: element.data.display_name
+                                            }
+                                        })
+                                        inquirer.prompt({
+                                            type:'list',
+                                            name: 'menu',
+                                            message: 'Choose a post you want to see!',
+                                            choices: mapedArraySubPost
+                                        }).then(
+                                            
+                                            function(input) {
+                                                var userSubInput = input['menu'];
+                                                redditFunctions.getSubreddit(userSubInput, function(err, displaySubRedPost){
+                                                    if(err){
+                                                        console.log("There was a problem loading post");
+                                                    }
+                                                    else {
+                                                        displaySubRedPost.forEach(displaySubRedditPost)
+                                                        mainMenu();
+                                                    }
+                                                    
+                                                })
+                                                
+                                            }
+                                            
+                                            )
                                     }
                                 })
                             }
